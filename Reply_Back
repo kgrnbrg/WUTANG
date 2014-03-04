@@ -1,0 +1,103 @@
+import twitter4j.*;
+import twitter4j.api.*;
+import twitter4j.auth.*;
+import twitter4j.conf.*;
+import twitter4j.json.*;
+import twitter4j.management.*;
+import twitter4j.util.*;
+
+import java.util.List;
+import java.util.Date;
+
+static String OAuthConsumerKey = "tB14ffOvf76r2Lq6G67P7g";
+static String OAuthConsumerSecret = "gW7DY1OtAReSP65Q8KKEt0KtHJQ4nSPqZWciV1kdPE";
+static String AccessToken = "2187688542-XpsfJJPAZ0Go86riHLq69pTHOR4dhJS5A7o5I5j";
+static String AccessTokenSecret ="ZeIi2XxdJazjC12CK56FaPA8ljIf3eeTkoiYZbIPPWwJE";
+
+String myTimeline;
+java.util.List statuses = null;
+User[] friends;
+Twitter twitter = new TwitterFactory().getInstance();
+RequestToken requestToken;
+String[] theSearchTweets = new String[11];
+
+String sendto = "";
+String replyToStatus = "";
+long idStr; //dynamically store the id of the tweet I want to reply to as a long
+int currentTweet;
+List<Status> tweets;
+long statusId;
+String scrName;
+
+
+void connectTwitter() {
+
+  twitter.setOAuthConsumer(OAuthConsumerKey, OAuthConsumerSecret);
+  AccessToken accessToken = loadAccessToken();
+  twitter.setOAuthAccessToken(accessToken);
+}
+
+
+int fetch() {
+ 
+  String queryStr = "#Wutang" + "#CREAM";
+ 
+  try {
+    Query query = new Query(queryStr);
+    query.count(10); // Get 10 of the 100 search results
+    QueryResult result = twitter.search(query);
+    ArrayList tweets = (ArrayList) result.getTweets(); 
+    int num = tweets.size();
+    for (int i=0; i<tweets.size(); i++) {
+      Status t=(Status) tweets.get(i);
+      User u=(User) t.getUser();
+      String user=u.getName();
+      scrName=u.getScreenName();
+      long id=u.getId();
+      
+     //for (i=0;i<tweet //for loop if new id is in the list of old ids if it is return 0 
+      //another forloop that checks to see if thing of our list of titles is contained in this tweet using IndexOf = -1. 
+       statusId = t.getId();
+      String msg = t.getText();
+      long rplySt = t.getInReplyToStatusId(); //if this tweet was in reply to a tweet, get the id of the original tweet
+      String rply = t.getInReplyToScreenName(); //if this tweet was in reply to someone, get the name of the person it was replying to
+
+      Date d = t.getCreatedAt();
+      theSearchTweets[i] = msg.substring(queryStr.length()+1);
+      println("Tweet by " + scrName + " at " + d + ": " + msg);
+      println(theSearchTweets[i]);
+
+      sendto = scrName;
+      idStr = statusId;
+    }
+
+    println("here" + num);
+    return num;
+  }
+
+  catch (TwitterException e) {
+    println("Search tweets: " + e);
+    return 0;
+  }
+}
+void reply() { //SEARCH FOR A STRING, GET THE TWEET ID AND SENDER ID, AND REPLY TO IT
+
+
+  try {
+
+    //////this block of code allows me to reply to a status id\\\\\\\
+    long inReplyToStatusId = idStr; 
+    StatusUpdate statusUpdate = new StatusUpdate("@" + sendto + " #WuIsBack" + " http://wutang.kgitp.com/uploads/" + filename); // message i want to post as a reply to the above tweet
+    statusUpdate.inReplyToStatusId(inReplyToStatusId);
+    Status status = twitter.updateStatus(statusUpdate);
+    println("Successfully updated the status to [" + status.getText() + "].");
+  }
+  catch(TwitterException e) {
+    println("Send tweet: " + e + " Status code: " + e.getStatusCode());
+  }
+}
+
+// Loading up the access token
+private static AccessToken loadAccessToken() {
+  return new AccessToken(AccessToken, AccessTokenSecret);
+}
