@@ -1,0 +1,179 @@
+FTPClient ftp;
+//music player imports
+import ddf.minim.signals.*;
+import ddf.minim.*;
+import ddf.minim.analysis.*;
+import ddf.minim.ugens.*;
+import ddf.minim.effects.*;
+import ddf.minim.* ;
+//Sharon
+int imageCount;
+int xC = 200; 
+int yC = 20;
+String allText;
+String word; 
+String[] cream;
+int counter = 0;
+IntDict concordance;
+PImage wutang; 
+Minim minim;
+String cream2= "cream";
+String cream3= "dolla";
+
+//host kg
+float saveFrame;
+String filename ;
+int Query= 1;
+String host = "wutang.kgitp.com";
+String username = "thekza";
+String password = "4jeJrZG2";
+String remotePath = "kgitp.com";
+String localPath = "/Users/Kyle/Documents/ITP/ICM/WUFINAL/";
+int lastFetch ;
+int numberOfTweet;
+
+AudioPlayer player;
+
+void setup () {
+  size(1100, 600);
+  background (0);
+ connectTwitter();
+   ///////////////////////////////////////////////// TOP TEN MUSIC
+  minim = new Minim(this) ;
+  player = minim.loadFile("cream.wav") ;
+  
+  wutang = loadImage("wutangremix.jpg");
+
+  /////////////////////////////////////////////// LYRICS  
+  concordance = new IntDict();
+
+  ////CREAM  
+  String[] lines = loadStrings("cream2.txt");
+  allText = join(lines, " ").toLowerCase();
+  cream = splitTokens(allText, " ,?!:;[]()-\"");
+
+  // Create the font
+  textFont(createFont("Georgia", 16));
+  fill(255, 203, 59);
+  text("Powered by @Wu_ITP, 2013", 10, 570);
+  text("This is a project fueled by students of NYU's ITP program, Tweet your favorite Wutang lyrics, hashtag it with #Wutang, and get Wu'd!", 10, 590);
+   fill(255, 203, 59);
+   textFont(createFont("LatinWide-48",50));
+  text("C.R.E.A.M.", 430, 520);
+  
+  numberOfTweet = fetch();
+}
+
+void draw(){
+   if(numberOfTweet > 0){
+     wudraw();
+   }
+  //if(millis() - lastFetch > 10*1000){
+  if (counter >= cream.length ) { 
+     doEveryThing();
+    //lastFetch = millis();
+    //counter = 0;
+   // numberOfTweet=fetch();
+    println("finish");
+  }
+  }
+
+
+void doEveryThing(){
+    wupic();
+    wupload();
+    reply();
+    exit();
+  }
+
+
+void wudraw() {
+
+ if (Query == 1) {
+    player.play();
+
+    // Look at words one at a time
+
+    if (counter < cream.length )
+      word = cream[counter++];//get each word
+
+    //THIS IS THE CODE THAT MIMCS THE PIXELS BEHIND THE TEXT IN ORDER for the text to mimic the color of the pixel!!  
+
+  
+    color pixC = wutang.get(xC, yC);
+    int fsize = 8;
+
+    //if the string says "cream" make a different color
+    if(word.equals("dolla dolla")){
+      textSize(10);
+      fill(255,223,41);
+    } else {
+      //textFont(which, size)
+      textSize(fsize);
+      fill(pixC );
+      
+    }
+    
+    text(word, xC, yC);
+//    println(word + "/" + cream2);
+
+ // Move along the x-axis
+    xC += textWidth(word + " ");
+
+    // If x gets to the end, move y
+    if (xC >= 860) {
+      xC = 230;
+      yC += 10;
+    }
+
+    // If y gets to the end, we're done
+    if (yC >500) {
+     yC=height;
+    }
+    
+   
+ }  
+
+  wutang.updatePixels();
+        }
+
+void wupic() {
+  filename = "wu" + String.valueOf(millis()) + ".jpg";
+  saveFrame(filename);
+  
+}
+
+void wupload() {
+  
+  try {
+    // set up client
+    ftp = new FTPClient();
+    ftp.setRemoteHost("kgitp.com"); // ie. ftp.site.com
+    FTPMessageCollector listener = new FTPMessageCollector();
+    ftp.setMessageListener(listener);
+
+    // connect
+    println ("Connecting");
+    ftp.connect();
+
+    // login
+    println ("Logging in");
+    ftp.login("thekza", "4jeJrZG2");
+
+    // set up passive ASCII transfers
+    println ("Setting up passive, ASCII transfers");
+    ftp.setConnectMode(FTPConnectMode.PASV);
+    
+    ftp.setType(FTPTransferType.BINARY);
+    println("uploading " + localPath + filename);
+    ftp.put(localPath + filename, "/wutang.kgitp.com/uploads/" + filename);
+
+  } 
+  catch (Exception e) {
+
+    println ("Demo failed");
+  }
+}
+
+
+
