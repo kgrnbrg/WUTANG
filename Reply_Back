@@ -9,10 +9,10 @@ import twitter4j.util.*;
 import java.util.List;
 import java.util.Date;
 
-static String OAuthConsumerKey = "tB14ffOvf76r2Lq6G67P7g";
-static String OAuthConsumerSecret = "gW7DY1OtAReSP65Q8KKEt0KtHJQ4nSPqZWciV1kdPE";
-static String AccessToken = "2187688542-XpsfJJPAZ0Go86riHLq69pTHOR4dhJS5A7o5I5j";
-static String AccessTokenSecret ="ZeIi2XxdJazjC12CK56FaPA8ljIf3eeTkoiYZbIPPWwJE";
+static String OAuthConsumerKey = "YOUR CONSUMER KEY";
+static String OAuthConsumerSecret = "YOUR CONSUMER SECRET";
+static String AccessToken = "YOUR ACCESSTOKEN";
+static String AccessTokenSecret ="YOUR ACCESTOKENSECRET";
 
 String myTimeline;
 java.util.List statuses = null;
